@@ -30,6 +30,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   String _currentLocation = 'New York'; // Default location
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
+  TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
     final Uri uri = Uri.parse(
@@ -54,6 +55,14 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     super.dispose();
   }
 
+  double _convertTemperature(double temperature) {
+    if (_currentUnit == TemperatureUnit.fahrenheit) {
+      return (temperature * 9 / 5) + 32;
+    } else {
+      return temperature;
+    }
+  }
+
   void _changeLocation() {
     setState(() {
       _currentLocation = _locationController.text;
@@ -76,11 +85,12 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
           const SizedBox(height: 20),
           Text(
             _weatherData!['name'],
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style:
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           Text(
-            '${_weatherData!['main']['temp']}°C',
+            '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
             style: const TextStyle(fontSize: 48),
           ),
           const SizedBox(height: 20),
@@ -109,8 +119,31 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
               ),
             ],
           ),
+          DropdownButton<TemperatureUnit>(
+            value: _currentUnit,
+            onChanged: (unit) {
+              setState(() {
+                _currentUnit = unit!;
+              });
+            },
+            items: [
+              DropdownMenuItem(
+                value: TemperatureUnit.celsius,
+                child: Text('Celsius'),
+              ),
+              DropdownMenuItem(
+                value: TemperatureUnit.fahrenheit,
+                child: Text('Fahrenheit'),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
+}
+
+enum TemperatureUnit {
+  celsius,
+  fahrenheit,
 }
