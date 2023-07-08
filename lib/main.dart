@@ -55,12 +55,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     super.dispose();
   }
 
-  double _convertTemperature(dynamic temperature) {
-    double temp = temperature is int ? temperature.toDouble() : temperature;
+  double _convertTemperature(double temperature) {
     if (_currentUnit == TemperatureUnit.fahrenheit) {
-      return (temp * 9 / 5) + 32;
+      return (temperature * 9 / 5) + 32;
     } else {
-      return temp;
+      return temperature;
     }
   }
 
@@ -75,7 +74,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       case 'Snow':
         return 'assets/images/snow.jpg';
       default:
-        return 'assets/default.png';
+        return 'assets/images/default.jpg';
     }
   }
 
@@ -89,22 +88,19 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: _weatherData != null
-            ? DecorationImage(
-          image: AssetImage(
-            _getImageAsset(_weatherData!['weather'][0]['main']),
-          ),
-          fit: BoxFit.cover,
-        )
-            : null,
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Weather App'),
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          image: _weatherData != null
+              ? DecorationImage(
+            image: AssetImage(
+              _getImageAsset(_weatherData!['weather'][0]['main']),
+            ),
+            fit: BoxFit.cover,
+          )
+              : null,
         ),
-        body: _weatherData == null
+        child: _weatherData == null
             ? const Center(child: CircularProgressIndicator())
             : Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -116,6 +112,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
+            Image.asset(
+              _getImageAsset(_weatherData!['weather'][0]['main']),
+              width: 100,
+              height: 100,
+            ),
             const SizedBox(height: 20),
             Text(
               '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
