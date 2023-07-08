@@ -57,7 +57,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   double _convertTemperature(double temperature) {
     if (_currentUnit == TemperatureUnit.fahrenheit) {
-      return (temperature * 9 / 5) + 32;
+      return (temperature * 9 / 5) + 32.0; // Use a double constant for 32
     } else {
       return temperature;
     }
