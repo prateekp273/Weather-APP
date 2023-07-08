@@ -55,11 +55,12 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     super.dispose();
   }
 
-  double _convertTemperature(double temperature) {
+  double _convertTemperature(dynamic temperature) {
+    double temp = temperature is int ? temperature.toDouble() : temperature;
     if (_currentUnit == TemperatureUnit.fahrenheit) {
-      return (temperature * 9 / 5) + 32;
+      return (temp * 9 / 5) + 32;
     } else {
-      return temperature;
+      return temp;
     }
   }
 
@@ -68,7 +69,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       case 'Clear':
         return 'assets/images/clear.jpg';
       case 'Clouds':
-        return 'assets/images/clouds.webp';
+        return 'assets/images/clouds.jpg';
       case 'Rain':
         return 'assets/images/rain.jpg';
       case 'Snow':
@@ -90,12 +91,14 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
+        image: _weatherData != null
+            ? DecorationImage(
           image: AssetImage(
             _getImageAsset(_weatherData!['weather'][0]['main']),
           ),
           fit: BoxFit.cover,
-        ),
+        )
+            : null,
       ),
       child: Scaffold(
         appBar: AppBar(
