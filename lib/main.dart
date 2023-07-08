@@ -14,7 +14,7 @@ class WeatherApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, // Remove the debug banner
       home: WeatherHomePage(),
     );
   }
@@ -26,8 +26,8 @@ class WeatherHomePage extends StatefulWidget {
 }
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
-  String _apiKey = apiKey;
-  String _currentLocation = 'New York';
+  String _apiKey = apiKey; // Use the API key from api_keys.dart
+  String _currentLocation = 'New York'; // Default location
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
 
@@ -62,14 +62,6 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     });
   }
 
-  double _convertToCelsius(double tempInKelvin) {
-    return tempInKelvin - 273.15;
-  }
-
-  double _convertToFahrenheit(double tempInKelvin) {
-    return (tempInKelvin - 273.15) * 9 / 5 + 32;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +80,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
           ),
           const SizedBox(height: 20),
           Text(
-            '${_convertToCelsius(_weatherData!['main']['temp'])}°C / ${_convertToFahrenheit(_weatherData!['main']['temp'])}°F',
+            '${_weatherData!['main']['temp']}°C',
             style: const TextStyle(fontSize: 48),
           ),
           const SizedBox(height: 20),
