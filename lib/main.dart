@@ -63,6 +63,21 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     }
   }
 
+  String _getImageAsset(String weatherCondition) {
+    switch (weatherCondition) {
+      case 'Clear':
+        return 'assets/images/clear.jpg';
+      case 'Clouds':
+        return 'assets/images/clouds.webp';
+      case 'Rain':
+        return 'assets/images/rain.jpg';
+      case 'Snow':
+        return 'assets/images/snow.jpg';
+      default:
+        return 'assets/default.png';
+    }
+  }
+
   void _changeLocation() {
     setState(() {
       _currentLocation = _locationController.text;
@@ -73,71 +88,82 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weather App'),
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+            _getImageAsset(_weatherData!['weather'][0]['main']),
+          ),
+          fit: BoxFit.cover,
+        ),
       ),
-      body: _weatherData == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          Text(
-            _weatherData!['name'],
-            style:
-            const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
-            style: const TextStyle(fontSize: 48),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            _weatherData!['weather'][0]['main'],
-            style: const TextStyle(fontSize: 24),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: TextField(
-                    controller: _locationController,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter location',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Weather App'),
+        ),
+        body: _weatherData == null
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              _weatherData!['name'],
+              style: const TextStyle(
+                  fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            const SizedBox(height: 20),
+            Text(
+              '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
+              style: const TextStyle(fontSize: 48),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _weatherData!['weather'][0]['main'],
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: _locationController,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter location',
+                      ),
                     ),
                   ),
                 ),
-              ),
-              ElevatedButton(
-                onPressed: _changeLocation,
-                child: const Text('Change Location'),
-              ),
-            ],
-          ),
-          DropdownButton<TemperatureUnit>(
-            value: _currentUnit,
-            onChanged: (unit) {
-              setState(() {
-                _currentUnit = unit!;
-              });
-            },
-            items: [
-              DropdownMenuItem(
-                value: TemperatureUnit.celsius,
-                child: Text('Celsius'),
-              ),
-              DropdownMenuItem(
-                value: TemperatureUnit.fahrenheit,
-                child: Text('Fahrenheit'),
-              ),
-            ],
-          ),
-        ],
+                ElevatedButton(
+                  onPressed: _changeLocation,
+                  child: const Text('Change Location'),
+                ),
+              ],
+            ),
+            DropdownButton<TemperatureUnit>(
+              value: _currentUnit,
+              onChanged: (unit) {
+                setState(() {
+                  _currentUnit = unit!;
+                });
+              },
+              items: [
+                DropdownMenuItem(
+                  value: TemperatureUnit.celsius,
+                  child: Text('Celsius'),
+                ),
+                DropdownMenuItem(
+                  value: TemperatureUnit.fahrenheit,
+                  child: Text('Fahrenheit'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
