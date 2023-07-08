@@ -29,6 +29,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey; // Use the API key from api_keys.dart
   String _currentLocation = 'New York'; // Default location
   Map<String, dynamic>? _weatherData;
+  TextEditingController _locationController = TextEditingController();
 
   Future<void> _fetchWeatherData() async {
     final Uri uri = Uri.parse(
@@ -45,6 +46,20 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   void initState() {
     super.initState();
     _fetchWeatherData();
+  }
+
+  @override
+  void dispose() {
+    _locationController.dispose();
+    super.dispose();
+  }
+
+  void _changeLocation() {
+    setState(() {
+      _currentLocation = _locationController.text;
+      _fetchWeatherData();
+      _locationController.clear();
+    });
   }
 
   @override
@@ -74,14 +89,25 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
             style: const TextStyle(fontSize: 24),
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _currentLocation = 'London'; // Change the location to London
-                _fetchWeatherData();
-              });
-            },
-            child: const Text('Change Location'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: TextField(
+                    controller: _locationController,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter location',
+                    ),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: _changeLocation,
+                child: const Text('Change Location'),
+              ),
+            ],
           ),
         ],
       ),
