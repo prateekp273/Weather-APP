@@ -27,14 +27,15 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey; // Use the API key from api_keys.dart
-  String _currentLocation = 'New York'; // Default location
+  String _currentLocation = 'India'; // Default location
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
+    final String encodedLocation = Uri.encodeComponent(_currentLocation);
     final Uri uri = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?q=$_currentLocation&appid=$_apiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/weather?q=$encodedLocation&appid=$_apiKey&units=metric');
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       setState(() {
