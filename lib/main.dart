@@ -27,7 +27,7 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey; // Use the API key from api_keys.dart
-  String _currentLocation = 'India'; // Default location
+  String _currentLocation = 'New York'; // Default location
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
