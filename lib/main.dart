@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:weather_icons/weather_icons.dart'; // Import the weather-icons-flutter package
+import 'package:intl/intl.dart'; // Import the intl package for date formatting
+import 'package:weather_icons/weather_icons.dart';
 
 import 'api_keys.dart';
 
@@ -28,10 +29,9 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey;
-  String _currentLocation = 'New York, US'; // Default location
+  String _currentLocation = 'New York';
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
-  TextEditingController _countryController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
@@ -55,7 +55,6 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   @override
   void dispose() {
     _locationController.dispose();
-    _countryController.dispose();
     super.dispose();
   }
 
@@ -99,10 +98,9 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   void _changeLocation() {
     setState(() {
-      _currentLocation = '${_locationController.text.trim()}, ${_countryController.text.trim()}';
+      _currentLocation = '${_locationController.text.trim()}, IN'; // Assuming IN for India
       _fetchWeatherData();
       _locationController.clear();
-      _countryController.clear();
     });
   }
 
@@ -111,11 +109,6 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       _weatherData = null; // Clear the current weather data before fetching new data
     });
     await _fetchWeatherData();
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    final timeFormat = DateFormat.jm();
-    return timeFormat.format(dateTime);
   }
 
   @override
@@ -155,106 +148,88 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     color: Colors.white,
     size: 50,
     ),
-    const SizedBox(height: 20),
-    Text(
-    _weatherData!['weather'][0]['description'],
-    style: const TextStyle(fontSize: 24, color: Colors.white),
-    ),
-    const SizedBox(height: 20),
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Expanded(
-    child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: TextField(
-    controller: _locationController,
-    decoration: const InputDecoration(
-    labelText: 'Enter location',
-    labelStyle: TextStyle(color: Colors.white),
-    focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.white),
-    ),
-    enabledBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.white),
-    ),
-    ),
-    ),
-    ),
-    ),
-    Expanded(
-    child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: TextField(
-    controller: _countryController,
-    decoration: const InputDecoration(
-    labelText: 'Enter country',
-    labelStyle: TextStyle(color: Colors.white),
-    focusedBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.white),
-    ),
-    enabledBorder: OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.white),
-    ),
-    ),
-    ),
-    ),
-    ),
-    ElevatedButton(
-    onPressed: _changeLocation,
-    child: const Text('Change Location'),
-    ),
-    const SizedBox(width: 10),
-    ElevatedButton(
-    onPressed: _refreshWeatherData,
-    child: const Icon(Icons.refresh),
-    ),
-    ],
-    ),
-    DropdownButton<TemperatureUnit>(
-    value: _currentUnit,
-    onChanged: (unit) {
-    setState(() {
-    _currentUnit = unit!;
-    });
-    },
-    items: const [
-    DropdownMenuItem(
-    value: TemperatureUnit.celsius,
-    child: Text('Celsius'),
-    ),
-    DropdownMenuItem(
-    value: TemperatureUnit.fahrenheit,
-    child: Text('Fahrenheit'),
-    ),
-    ],
-    ),
-    const SizedBox(height: 20),
-    Text(
-    'Date & Time: ${_formatDateTime(DateTime.now())}',
-    style: const TextStyle(fontSize: 18, color: Colors.white),
-    ),
-    const SizedBox(height: 10),
-    Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: [
-    WeatherDetailTile(
-    icon: WeatherIcons.humidity,
-    label: 'Humidity',
-    value: '${_weatherData!['main']['humidity']}%',
-    ),
-    WeatherDetailTile(
-    icon: WeatherIcons.wind,
-    label: 'Wind',
-    value: '${_weatherData!['wind']['speed']} m/s',
-    ),
-    WeatherDetailTile(
-    icon: WeatherIcons.barometer,
-      label: 'Pressure',
-      value: '${_weatherData!['main']['pressure']} hPa',
-    ),
-    ],
-    ),
+      const SizedBox(height: 20),
+      Text(
+        _weatherData!['weather'][0]['description'],
+        style: const TextStyle(fontSize: 24, color: Colors.white),
+      ),
+      const SizedBox(height: 20),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                controller: _locationController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter location',
+                  labelStyle: TextStyle(color: Colors.white),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: _changeLocation,
+            child: const Text('Change Location'),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+            onPressed: _refreshWeatherData,
+            child: const Icon(Icons.refresh),
+          ),
+        ],
+      ),
+      DropdownButton<TemperatureUnit>(
+        value: _currentUnit,
+        onChanged: (unit) {
+          setState(() {
+            _currentUnit = unit!;
+          });
+        },
+        items: const [
+          DropdownMenuItem(
+            value: TemperatureUnit.celsius,
+            child: Text('Celsius'),
+          ),
+          DropdownMenuItem(
+            value: TemperatureUnit.fahrenheit,
+            child: Text('Fahrenheit'),
+          ),
+        ],
+      ),
+      const SizedBox(height: 20),
+      Text(
+        'Date & Time: ${DateFormat.yMd().add_jm().format(DateTime.now())}', // Format date and time
+        style: const TextStyle(fontSize: 18, color: Colors.white),
+      ),
+      const SizedBox(height: 10),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          WeatherDetailTile(
+            icon: WeatherIcons.humidity,
+            label: 'Humidity',
+            value: '${_weatherData!['main']['humidity']}%',
+          ),
+          WeatherDetailTile(
+            icon: WeatherIcons.wind,
+            label: 'Wind',
+            value: '${_weatherData!['wind']['speed']} m/s',
+          ),
+          WeatherDetailTile(
+            icon: WeatherIcons.barometer,
+            label: 'Pressure',
+            value: '${_weatherData!['main']['pressure']} hPa',
+          ),
+        ],
+      ),
     ],
     ),
           ],
