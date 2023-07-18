@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:intl/intl.dart'; // Import the intl package for date formatting
+import 'package:intl/intl.dart';
 import 'package:weather_icons/weather_icons.dart';
 
 import 'api_keys.dart';
@@ -29,15 +29,14 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey;
-  String _currentLocation = 'New York';
+  int _currentCityId = 5128581; // Default city ID for New York
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
-    final String encodedLocation = Uri.encodeComponent(_currentLocation);
     final Uri uri = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?q=$encodedLocation&appid=$_apiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/weather?id=$_currentCityId&appid=$_apiKey&units=metric');
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       setState(() {
@@ -97,11 +96,15 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   }
 
   void _changeLocation() {
-    setState(() {
-      _currentLocation = '${_locationController.text.trim()}, IN'; // Assuming IN for India
+    final String cityIdStr = _locationController.text.trim();
+    final int cityId = int.tryParse(cityIdStr) ?? 0;
+    if (cityId != 0) {
+      setState(() {
+        _currentCityId = cityId;
+      });
       _fetchWeatherData();
-      _locationController.clear();
-    });
+    }
+    _locationController.clear();
   }
 
   Future<void> _refreshWeatherData() async {
@@ -118,121 +121,122 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
     return Scaffold(
       body: Stack(
-          fit: StackFit.expand,
-          children: [
+        fit: StackFit.expand,
+        children: [
           Image.asset(
-          _getImageAsset(weatherCondition),
-      fit: BoxFit.cover,
-    ),
-    isLoading
-    ? const Center(
-    child: CircularProgressIndicator(),
-    )
-        : Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-    const SizedBox(height: 50),
-    Text(
-    _weatherData!['name'],
-    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-    ),
-    const SizedBox(height: 10),
-    Text(
-    '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
-    style: const TextStyle(fontSize: 48, color: Colors.white),
-    ),
-    const SizedBox(height: 5),
-    Icon(
-    _getWeatherIcon(_weatherData!['weather'][0]['main']),
-    color: Colors.white,
-    size: 50,
-    ),
-      const SizedBox(height: 20),
-      Text(
-        _weatherData!['weather'][0]['description'],
-        style: const TextStyle(fontSize: 24, color: Colors.white),
-      ),
-      const SizedBox(height: 20),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                controller: _locationController,
-                decoration: const InputDecoration(
-                  labelText: 'Enter location',
-                  labelStyle: TextStyle(color: Colors.white),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
+            _getImageAsset(weatherCondition),
+            fit: BoxFit.cover,
+          ),
+          isLoading
+              ? const Center(
+            child: CircularProgressIndicator(),
+          )
+              : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 50),
+              Text(
+                _weatherData!['name'],
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
               ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _changeLocation,
-            child: const Text('Change Location'),
-          ),
-          const SizedBox(width: 10),
-          ElevatedButton(
-            onPressed: _refreshWeatherData,
-            child: const Icon(Icons.refresh),
+              const SizedBox(height: 10),
+              Text(
+                '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
+                style: const TextStyle(fontSize: 48, color: Colors.white),
+              ),
+              const SizedBox(height: 5),
+              Icon(
+                _getWeatherIcon(_weatherData!['weather'][0]['main']),
+                color: Colors.white,
+                size: 50,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _weatherData!['weather'][0]['description'],
+                style: const TextStyle(fontSize: 24, color: Colors.white),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextField(
+                        controller: _locationController,
+                        keyboardType: TextInputType.number, // Only allow numeric input
+                        decoration: const InputDecoration(
+                          labelText: 'Enter City ID',
+                          labelStyle: TextStyle(color: Colors.white),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _changeLocation,
+                    child: const Text('Change Location'),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: _refreshWeatherData,
+                    child: const Icon(Icons.refresh),
+                  ),
+                ],
+              ),
+              DropdownButton<TemperatureUnit>(
+                value: _currentUnit,
+                onChanged: (unit) {
+                  setState(() {
+                    _currentUnit = unit!;
+                  });
+                },
+                items: const [
+                  DropdownMenuItem(
+                    value: TemperatureUnit.celsius,
+                    child: Text('Celsius'),
+                  ),
+                  DropdownMenuItem(
+                    value: TemperatureUnit.fahrenheit,
+                    child: Text('Fahrenheit'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Date & Time: ${DateFormat.yMd().add_jm().format(DateTime.now())}',
+                style: const TextStyle(fontSize: 18, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  WeatherDetailTile(
+                    icon: WeatherIcons.humidity,
+                    label: 'Humidity',
+                    value: '${_weatherData!['main']['humidity']}%',
+                  ),
+                  WeatherDetailTile(
+                    icon: WeatherIcons.wind,
+                    label: 'Wind',
+                    value: '${_weatherData!['wind']['speed']} m/s',
+                  ),
+                  WeatherDetailTile(
+                    icon: WeatherIcons.barometer,
+                    label: 'Pressure',
+                    value: '${_weatherData!['main']['pressure']} hPa',
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
-      ),
-      DropdownButton<TemperatureUnit>(
-        value: _currentUnit,
-        onChanged: (unit) {
-          setState(() {
-            _currentUnit = unit!;
-          });
-        },
-        items: const [
-          DropdownMenuItem(
-            value: TemperatureUnit.celsius,
-            child: Text('Celsius'),
-          ),
-          DropdownMenuItem(
-            value: TemperatureUnit.fahrenheit,
-            child: Text('Fahrenheit'),
-          ),
-        ],
-      ),
-      const SizedBox(height: 20),
-      Text(
-        'Date & Time: ${DateFormat.yMd().add_jm().format(DateTime.now())}', // Format date and time
-        style: const TextStyle(fontSize: 18, color: Colors.white),
-      ),
-      const SizedBox(height: 10),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          WeatherDetailTile(
-            icon: WeatherIcons.humidity,
-            label: 'Humidity',
-            value: '${_weatherData!['main']['humidity']}%',
-          ),
-          WeatherDetailTile(
-            icon: WeatherIcons.wind,
-            label: 'Wind',
-            value: '${_weatherData!['wind']['speed']} m/s',
-          ),
-          WeatherDetailTile(
-            icon: WeatherIcons.barometer,
-            label: 'Pressure',
-            value: '${_weatherData!['main']['pressure']} hPa',
-          ),
-        ],
-      ),
-    ],
-    ),
-          ],
       ),
     );
   }
@@ -277,4 +281,3 @@ enum TemperatureUnit {
   celsius,
   fahrenheit,
 }
-
