@@ -15,7 +15,6 @@ class WeatherApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-
       debugShowCheckedModeBanner: false,
       home: WeatherHomePage(),
     );
@@ -98,7 +97,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   void _changeLocation() {
     setState(() {
-      _currentLocation = _locationController.text;
+      _currentLocation = '${_locationController.text.trim()}, IN'; // Assuming IN for India
       _fetchWeatherData();
       _locationController.clear();
     });
