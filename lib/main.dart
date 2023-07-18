@@ -28,9 +28,10 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey;
-  String _currentLocation = 'New York';
+  String _currentLocation = 'New York, US'; // Default location
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
+  TextEditingController _countryController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
@@ -54,6 +55,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   @override
   void dispose() {
     _locationController.dispose();
+    _countryController.dispose();
     super.dispose();
   }
 
@@ -97,9 +99,10 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   void _changeLocation() {
     setState(() {
-      _currentLocation = '${_locationController.text.trim()}, IN'; // Assuming IN for India
+      _currentLocation = '${_locationController.text.trim()}, ${_countryController.text.trim()}';
       _fetchWeatherData();
       _locationController.clear();
+      _countryController.clear();
     });
   }
 
@@ -108,6 +111,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
       _weatherData = null; // Clear the current weather data before fetching new data
     });
     await _fetchWeatherData();
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final timeFormat = DateFormat.jm();
+    return timeFormat.format(dateTime);
   }
 
   @override
@@ -174,6 +182,24 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     ),
     ),
     ),
+    Expanded(
+    child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: TextField(
+    controller: _countryController,
+    decoration: const InputDecoration(
+    labelText: 'Enter country',
+    labelStyle: TextStyle(color: Colors.white),
+    focusedBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.white),
+    ),
+    enabledBorder: OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.white),
+    ),
+    ),
+    ),
+    ),
+    ),
     ElevatedButton(
     onPressed: _changeLocation,
     child: const Text('Change Location'),
@@ -205,7 +231,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     ),
     const SizedBox(height: 20),
     Text(
-    'Date & Time: ${DateTime.now().toString()}',
+    'Date & Time: ${_formatDateTime(DateTime.now())}',
     style: const TextStyle(fontSize: 18, color: Colors.white),
     ),
     const SizedBox(height: 10),
@@ -217,21 +243,16 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     label: 'Humidity',
     value: '${_weatherData!['main']['humidity']}%',
     ),
-      WeatherDetailTile(
-        icon: WeatherIcons.humidity,
-        label: 'Humidity',
-        value: '${_weatherData!['main']['humidity']}%',
-      ),
-      WeatherDetailTile(
-        icon: WeatherIcons.wind,
-        label: 'Wind',
-        value: '${_weatherData!['wind']['speed']} m/s',
-      ),
-      WeatherDetailTile(
-        icon: WeatherIcons.barometer,
-        label: 'Pressure',
-        value: '${_weatherData!['main']['pressure']} hPa',
-      ),
+    WeatherDetailTile(
+    icon: WeatherIcons.wind,
+    label: 'Wind',
+    value: '${_weatherData!['wind']['speed']} m/s',
+    ),
+    WeatherDetailTile(
+    icon: WeatherIcons.barometer,
+      label: 'Pressure',
+      value: '${_weatherData!['main']['pressure']} hPa',
+    ),
     ],
     ),
     ],
@@ -281,3 +302,4 @@ enum TemperatureUnit {
   celsius,
   fahrenheit,
 }
+
