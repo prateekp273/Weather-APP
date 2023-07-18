@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:weather_icons/weather_icons.dart'; // Import the weather-icons-flutter package
 
 import 'api_keys.dart';
 
@@ -14,7 +15,7 @@ class WeatherApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      debugShowCheckedModeBanner: false, // Remove the debug banner
+      debugShowCheckedModeBanner: false,
       home: WeatherHomePage(),
     );
   }
@@ -26,8 +27,8 @@ class WeatherHomePage extends StatefulWidget {
 }
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
-  String _apiKey = apiKey; // Use the API key from api_keys.dart
-  String _currentLocation = 'New York'; // Default location
+  String _apiKey = apiKey;
+  String _currentLocation = 'New York';
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
@@ -58,24 +59,24 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
 
   double _convertTemperature(double temperature) {
     if (_currentUnit == TemperatureUnit.fahrenheit) {
-      return (temperature * 9 / 5) + 32.0; // Use a double constant for 32
+      return (temperature * 9 / 5) + 32.0;
     } else {
       return temperature;
     }
   }
 
-  String _getImageAsset(String weatherCondition) {
+  IconData _getWeatherIcon(String weatherCondition) {
     switch (weatherCondition) {
       case 'Clear':
-        return 'assets/images/clear.jpg';
+        return WeatherIcons.day_sunny;
       case 'Clouds':
-        return 'assets/images/clouds.jpg';
+        return WeatherIcons.cloudy;
       case 'Rain':
-        return 'assets/images/rain.jpg';
+        return WeatherIcons.rain;
       case 'Snow':
-        return 'assets/images/snow.jpg';
+        return WeatherIcons.snow;
       default:
-        return 'assets/images/default.jpg';
+        return WeatherIcons.day_sunny; // Default icon
     }
   }
 
@@ -87,46 +88,72 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     });
   }
 
+  Future<void> _refreshWeatherData() async {
+    setState(() {
+      _weatherData = null; // Clear the current weather data before fetching new data
+    });
+    await _fetchWeatherData();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isLoading = _weatherData == null;
+
+    // Set up a gradient background based on weather conditions
+    List<Color> gradientColors;
+    if (!isLoading) {
+      final mainWeather = _weatherData!['weather'][0]['main'];
+      if (mainWeather == 'Clear') {
+        gradientColors = [Colors.deepSkyBlue, Colors.lightBlue];
+      } else if (mainWeather == 'Clouds') {
+        gradientColors = [Colors.grey.shade800, Colors.grey.shade500];
+      } else if (mainWeather == 'Rain' || mainWeather == 'Drizzle') {
+        gradientColors = [Colors.indigo.shade800, Colors.indigo];
+      } else if (mainWeather == 'Snow') {
+        gradientColors = [Colors.blueGrey, Colors.white];
+      } else {
+        gradientColors = [Colors.blue, Colors.lightBlueAccent];
+      }
+    } else {
+      gradientColors = [Colors.blue, Colors.lightBlueAccent];
+    }
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          image: _weatherData != null
-              ? DecorationImage(
-            image: AssetImage(
-              _getImageAsset(_weatherData!['weather'][0]['main']),
-            ),
-            fit: BoxFit.cover,
-          )
-              : null,
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
-        child: _weatherData == null
-            ? const Center(child: CircularProgressIndicator())
+        child: isLoading
+            ? Center(
+          child: CircularProgressIndicator(),
+        )
             : Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
             Text(
               _weatherData!['name'],
-              style: const TextStyle(
-                  fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             ),
-            const SizedBox(height: 20),
-            Image.asset(
-              _getImageAsset(_weatherData!['weather'][0]['main']),
-              width: 100,
-              height: 100,
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
               '${_convertTemperature(_weatherData!['main']['temp']).toStringAsFixed(1)}°',
-              style: const TextStyle(fontSize: 48),
+              style: const TextStyle(fontSize: 48, color: Colors.white),
+            ),
+            const SizedBox(height: 5),
+            Icon(
+              _getWeatherIcon(_weatherData!['weather'][0]['main']),
+              color: Colors.white,
+              size: 50,
             ),
             const SizedBox(height: 20),
             Text(
-              _weatherData!['weather'][0]['main'],
-              style: const TextStyle(fontSize: 24),
+              _weatherData!['weather'][0]['description'],
+              style: const TextStyle(fontSize: 24, color: Colors.white),
             ),
             const SizedBox(height: 20),
             Row(
@@ -139,6 +166,13 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                       controller: _locationController,
                       decoration: const InputDecoration(
                         labelText: 'Enter location',
+                        labelStyle: TextStyle(color: Colors.white),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
@@ -146,6 +180,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                 ElevatedButton(
                   onPressed: _changeLocation,
                   child: const Text('Change Location'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _refreshWeatherData,
+                  child: const Icon(Icons.refresh),
                 ),
               ],
             ),
