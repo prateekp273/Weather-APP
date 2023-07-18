@@ -29,14 +29,15 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   String _apiKey = apiKey;
-  int _currentCityId = 5128581; // Default city ID for New York
+  String _currentLocation = 'New York'; // Default location is New York
   Map<String, dynamic>? _weatherData;
   TextEditingController _locationController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
+    final String encodedLocation = Uri.encodeComponent(_currentLocation);
     final Uri uri = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?id=$_currentCityId&appid=$_apiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/weather?q=$encodedLocation&appid=$_apiKey&units=metric');
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       setState(() {
@@ -96,15 +97,11 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   }
 
   void _changeLocation() {
-    final String cityIdStr = _locationController.text.trim();
-    final int cityId = int.tryParse(cityIdStr) ?? 0;
-    if (cityId != 0) {
-      setState(() {
-        _currentCityId = cityId;
-      });
+    setState(() {
+      _currentLocation = _locationController.text.trim();
       _fetchWeatherData();
-    }
-    _locationController.clear();
+      _locationController.clear();
+    });
   }
 
   Future<void> _refreshWeatherData() async {
@@ -165,9 +162,8 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: TextField(
                         controller: _locationController,
-                        keyboardType: TextInputType.number, // Only allow numeric input
                         decoration: const InputDecoration(
-                          labelText: 'Enter City ID',
+                          labelText: 'Enter location',
                           labelStyle: TextStyle(color: Colors.white),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white),
@@ -248,9 +244,9 @@ class WeatherDetailTile extends StatelessWidget {
   final String value;
 
   const WeatherDetailTile({
-    required this.icon,
-    required this.label,
-    required this.value,
+  required this.icon,
+  required this.label,
+  required this.value,
   });
 
   @override
