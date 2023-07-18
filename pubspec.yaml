@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   http: ^0.13.4
-  weather_icons_flutter: ^5.0.1 # Add the weather_icons_flutter package here
+  weather_icons: ^3.0.0 # Use the compatible version here
 
   flutter:
     sdk: flutter

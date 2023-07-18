@@ -104,7 +104,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     if (!isLoading) {
       final mainWeather = _weatherData!['weather'][0]['main'];
       if (mainWeather == 'Clear') {
-        gradientColors = [Colors.deepSkyBlue, Colors.lightBlue];
+        gradientColors = [Colors.lightBlue, Colors.lightBlue];
       } else if (mainWeather == 'Clouds') {
         gradientColors = [Colors.grey.shade800, Colors.grey.shade500];
       } else if (mainWeather == 'Rain' || mainWeather == 'Drizzle') {
