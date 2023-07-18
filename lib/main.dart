@@ -80,6 +80,21 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     }
   }
 
+  String _getImageAsset(String weatherCondition) {
+    switch (weatherCondition) {
+      case 'Clear':
+        return 'assets/images/clear.jpg';
+      case 'Clouds':
+        return 'assets/images/clouds.jpg';
+      case 'Rain':
+        return 'assets/images/rain.jpg';
+      case 'Snow':
+        return 'assets/images/snow.jpg';
+      default:
+        return 'assets/images/default.jpg'; // Fallback image
+    }
+  }
+
   void _changeLocation() {
     setState(() {
       _currentLocation = _locationController.text;
@@ -98,35 +113,17 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   @override
   Widget build(BuildContext context) {
     final bool isLoading = _weatherData == null;
-
-    // Set up a gradient background based on weather conditions
-    List<Color> gradientColors;
-    if (!isLoading) {
-      final mainWeather = _weatherData!['weather'][0]['main'];
-      if (mainWeather == 'Clear') {
-        gradientColors = [Colors.lightBlue, Colors.lightBlue];
-      } else if (mainWeather == 'Clouds') {
-        gradientColors = [Colors.grey.shade800, Colors.grey.shade500];
-      } else if (mainWeather == 'Rain' || mainWeather == 'Drizzle') {
-        gradientColors = [Colors.indigo.shade800, Colors.indigo];
-      } else if (mainWeather == 'Snow') {
-        gradientColors = [Colors.blueGrey, Colors.white];
-      } else {
-        gradientColors = [Colors.blue, Colors.lightBlueAccent];
-      }
-    } else {
-      gradientColors = [Colors.blue, Colors.lightBlueAccent];
-    }
+    final String weatherCondition = isLoading ? 'Default' : _weatherData!['weather'][0]['main'];
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradientColors,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+      body: Image.asset(
+        _getImageAsset(weatherCondition),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        alignment: Alignment.center,
+        colorBlendMode: BlendMode.darken,
+        color: Colors.black87,
         child: isLoading
             ? Center(
           child: CircularProgressIndicator(),
