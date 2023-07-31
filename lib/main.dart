@@ -204,6 +204,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
               Text(
                 'Date & Time: ${DateFormat.yMd().add_jm().format(DateTime.now())}',
