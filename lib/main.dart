@@ -85,12 +85,16 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     switch (weatherCondition) {
       case 'Clear':
         return 'assets/images/clear.jpg';
+
       case 'Clouds':
         return 'assets/images/clouds.jpg';
+
       case 'Rain':
         return 'assets/images/rain.jpg';
+
       case 'Snow':
         return 'assets/images/snow.jpg';
+
       default:
         return 'assets/images/default.jpg'; // Fallback image
     }
