@@ -274,6 +274,7 @@ class WeatherDetailTile extends StatelessWidget {
   }
 }
 
+
 enum TemperatureUnit {
   celsius,
   fahrenheit,
