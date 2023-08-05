@@ -249,6 +249,7 @@ class WeatherDetailTile extends StatelessWidget {
   required this.value,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Column(
