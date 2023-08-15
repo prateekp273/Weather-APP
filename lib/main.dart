@@ -90,12 +90,16 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     switch (weatherCondition) {
       case 'Clear':
         return 'assets/images/clear.jpg';
+
       case 'Clouds':
         return 'assets/images/clouds.jpg';
+
       case 'Rain':
         return 'assets/images/rain.jpg';
+
       case 'Snow':
         return 'assets/images/snow.jpg';
+
       default:
         return 'assets/images/default.jpg'; // Fallback image
     }
@@ -209,6 +213,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
               Text(
                 'Date & Time: ${DateFormat.yMd().add_jm().format(DateTime.now())}',
@@ -254,6 +259,7 @@ class WeatherDetailTile extends StatelessWidget {
     required this.value,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -277,7 +283,6 @@ class WeatherDetailTile extends StatelessWidget {
     );
   }
 }
-
 enum TemperatureUnit {
   celsius,
   fahrenheit,
