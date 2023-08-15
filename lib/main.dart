@@ -6,9 +6,11 @@ import 'package:weather_icons/weather_icons.dart';
 
 import 'api_keys.dart';
 
-void main() => runApp(WeatherApp());
+void main() => runApp(const WeatherApp());
 
 class WeatherApp extends StatelessWidget {
+  const WeatherApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,21 +19,24 @@ class WeatherApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: WeatherHomePage(),
+      home: const WeatherHomePage(),
     );
   }
 }
 
 class WeatherHomePage extends StatefulWidget {
+  const WeatherHomePage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _WeatherHomePageState createState() => _WeatherHomePageState();
 }
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
-  String _apiKey = apiKey;
+  final String _apiKey = apiKey;
   String _currentLocation = 'New York'; // Default location is New York
   Map<String, dynamic>? _weatherData;
-  TextEditingController _locationController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   TemperatureUnit _currentUnit = TemperatureUnit.celsius;
 
   Future<void> _fetchWeatherData() async {
@@ -243,10 +248,10 @@ class WeatherDetailTile extends StatelessWidget {
   final String label;
   final String value;
 
-  const WeatherDetailTile({
-  required this.icon,
-  required this.label,
-  required this.value,
+  const WeatherDetailTile({super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
   });
 
   @override
